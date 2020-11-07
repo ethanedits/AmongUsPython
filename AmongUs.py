@@ -1,6 +1,5 @@
 import pymem, time, keyboard, os, colorama, random
-from colorama import Fore, init
-init()
+colorama.init()
 
 def dmaAddr(base, offsets):
   addr = mem.read_int(base)
