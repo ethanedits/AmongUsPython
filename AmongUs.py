@@ -1,5 +1,9 @@
-import pymem, time, keyboard, os, colorama, random
-colorama.init()
+import pymem
+import time
+import keyboard
+from pymem.process import module_from_name
+
+mem = pymem.Pymem("Among Us.exe")
 
 def dmaAddr(base, offsets):
   addr = mem.read_int(base)
@@ -7,63 +11,41 @@ def dmaAddr(base, offsets):
     addr = mem.read_int(addr + i)
   return addr
 
-def Module(handle, name, plus, offsets):
-    first = pymem.process.module_from_name(handle.process_handle, name).lpBaseOfDll + plus
-    last = dmaAddr(first,offsets)
-    return last
-
-mem = pymem.Pymem("Among Us.exe")
-
 speedVal = 10.0
-EnableImposter = False
-EnableGhost = False
-
-
-colors = list(vars(colorama.Fore).values())
-
-os.system("cls")
-print(random.choice(colors) + "AmongUs Cheat | EthanEdits")
-print("----------------------------------------------------------")
-print("F1 = Speed")
-print("F2 = ForceImposter")
-print("F3 = Ghost")
-print("---------------------------")    
-print("Console:")
+imposterVal = 1
+ghostVal = 1
 
 while True:
-    randomcolor = random.choice(colors)
 
-    Speed = Module(mem,"GameAssembly.dll",0x0144BB70,[0x5C, 0x4])
-    FImposter = Module(mem,"GameAssembly.dll",0x0144BB70,[0x5C, 0x0, 0x34])
-    Ghost = Module(mem,"GameAssembly.dll",0x0144BB70,[0x5C, 0x0, 0x34])
-
+    #Speed Cheat
     if keyboard.is_pressed("F1"):
-        time.sleep(0.2)
+        mem.write_float(dmaAddr(module_from_name(mem.process_handle, "GameAssembly.dll").lpBaseOfDll + 0x0144BB70, [0x5C, 0x4]) + 0x14, speedVal)
 
         if speedVal == 10.0:
             speedVal = 1.0
+            time.sleep(1)
         else:
             speedVal = 10.0
-        mem.write_float(Speed + 0x14, speedVal)
+            time.sleep(1)
 
+    #Force Imposter Cheat
     if keyboard.is_pressed("F2"):
-        time.sleep(0.2)
-        EnableImposter = not EnableImposter
+        mem.write_int(dmaAddr(module_from_name(mem.process_handle, "GameAssembly.dll").lpBaseOfDll + 0x0144BB70, [0x5C, 0x0, 0x34]) + 0x28, imposterVal)
 
-        mem.write_int(FImposter + 0x28, int(EnableImposter))
-
-        if EnableImposter:
-            print(randomcolor + "ForceImposter Activated")
+        if imposterVal == 1:
+            imposterVal = 0
+            time.sleep(1)
         else:
-            print(randomcolor + "ForceImposter Deactivated")
-    
+            imposterVal = 1
+            time.sleep(1)
+
+    #Ghost Cheat
     if keyboard.is_pressed("F3"):
-        time.sleep(0.2)
-        EnableGhost = not EnableGhost
+        mem.write_int(dmaAddr(module_from_name(mem.process_handle, "GameAssembly.dll").lpBaseOfDll + 0x0144BB70, [0x5C, 0x0, 0x34]) + 0x29, ghostVal)
 
-        mem.write_int(Ghost + 0x29, int(EnableGhost))
-
-        if EnableGhost:
-            print(randomcolor + "Ghost Activated")
+        if ghostVal == 1:
+            ghostVal = 0
+            time.sleep(1)
         else:
-            print(randomcolor + "Ghost Deactivated")
+            ghostVal = 1
+            time.sleep(1)
